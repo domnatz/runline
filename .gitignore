@@ -1,0 +1,23 @@
+# local configuration
+.env
+.env.*
+!.env.example
+/.local/
+
+# dependencies and generated files
+node_modules/
+.next/
+/apps/web/public/tech-sw.js
+next-env.d.ts
+dist/
+*.tsbuildinfo
+*.log
+
+# local verification
+tests/
+__tests__/
+*.test.*
+*.spec.*
+coverage/
+playwright-report/
+test-results/

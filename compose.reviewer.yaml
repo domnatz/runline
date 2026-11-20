@@ -1,0 +1,63 @@
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${RUNLINE_DB_PASSWORD:?initialize reviewer settings}
+
+  migrate:
+    environment:
+      PGPASSWORD: ${RUNLINE_DB_PASSWORD:?initialize reviewer settings}
+      RUNLINE_APP_PASSWORD: ${RUNLINE_APP_PASSWORD:?initialize reviewer settings}
+      RUNLINE_DOCUMENTS_PASSWORD: ${RUNLINE_DOCUMENTS_PASSWORD:?initialize reviewer settings}
+      RUNLINE_DEMO_MODE: "true"
+
+  api:
+    environment:
+      PGPASSWORD: ${RUNLINE_APP_PASSWORD:?initialize reviewer settings}
+      AWS_ACCESS_KEY_ID: ${RUNLINE_S3_ACCESS_KEY:?initialize reviewer settings}
+      AWS_SECRET_ACCESS_KEY: ${RUNLINE_S3_SECRET_KEY:?initialize reviewer settings}
+      RUNLINE_DEMO_MODE: "true"
+      RUNLINE_SECURE_COOKIE: "true"
+      RUNLINE_SESSION_SECRET: ${RUNLINE_SESSION_SECRET:?initialize reviewer settings}:${RUNLINE_DATASET_ID:?initialize reviewer settings}
+      RUNLINE_DATASET_ID: ${RUNLINE_DATASET_ID:?initialize reviewer settings}
+
+  worker:
+    environment:
+      PGPASSWORD: ${RUNLINE_DOCUMENTS_PASSWORD:?initialize reviewer settings}
+      AWS_ACCESS_KEY_ID: ${RUNLINE_S3_ACCESS_KEY:?initialize reviewer settings}
+      AWS_SECRET_ACCESS_KEY: ${RUNLINE_S3_SECRET_KEY:?initialize reviewer settings}
+
+  storage:
+    environment:
+      AWS_ACCESS_KEY_ID: ${RUNLINE_S3_ACCESS_KEY:?initialize reviewer settings}
+      AWS_SECRET_ACCESS_KEY: ${RUNLINE_S3_SECRET_KEY:?initialize reviewer settings}
+
+  web:
+    ports: !reset []
+
+  caddy:
+    image: caddy:2.11.9-alpine
+    restart: unless-stopped
+    environment:
+      RUNLINE_REVIEWER_HOST: ${RUNLINE_REVIEWER_HOST:?initialize reviewer settings}
+      RUNLINE_REVIEWER_HASH: ${RUNLINE_REVIEWER_HASH:?initialize reviewer settings}
+    ports:
+      - "${RUNLINE_BIND_IP:-0.0.0.0}:${RUNLINE_HTTP_PORT:-80}:80"
+      - "${RUNLINE_BIND_IP:-0.0.0.0}:${RUNLINE_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [web]
+    depends_on:
+      web:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    name: ${COMPOSE_PROJECT_NAME}-${RUNLINE_DATASET_ID:?initialize reviewer settings}-pgdata
+  document-data:
+    name: ${COMPOSE_PROJECT_NAME}-${RUNLINE_DATASET_ID:?initialize reviewer settings}-documents
+  queue-data:
+    name: ${COMPOSE_PROJECT_NAME}-${RUNLINE_DATASET_ID:?initialize reviewer settings}-queue
+  caddy-data:
+  caddy-config:

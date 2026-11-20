@@ -1,0 +1,32 @@
+{
+  "name": "@runline/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-field-worker.mjs && next build",
+    "dev": "node scripts/build-field-worker.mjs && next dev",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@radix-ui/react-select": "2.4.1",
+    "dexie": "4.4.7",
+    "dexie-react-hooks": "4.4.0",
+    "geist": "1.9.2",
+    "lucide-react": "1.76.0",
+    "maplibre-gl": "6.19.0",
+    "next": "16.4.6",
+    "pmtiles": "4.5.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sonner": "2.0.8",
+    "zustand": "5.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "esbuild": "0.28.2",
+    "tailwindcss": "^4.3.5"
+  }
+}
