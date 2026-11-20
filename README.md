@@ -60,7 +60,7 @@ GitHub Actions checks lint, types, production builds, and a Compose startup agai
 
 ## Host on a VPS
 
-The reviewer stack runs the sample workspace behind Caddy with HTTPS and a shared reviewer password. The operations guide covers host setup, private credentials, data reset, backups, and restore. [VPS setup and recovery](deploy/operations.md#host-a-reviewer-instance)
+The reviewer stack serves the sample workspace over HTTPS with Caddy. The operations guide covers host setup, private credentials, data reset, backups, and restore. [VPS setup and recovery](deploy/operations.md#host-a-reviewer-instance)
 
 ## Map data
 

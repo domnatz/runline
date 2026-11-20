@@ -9,7 +9,6 @@ project=${RUNLINE_REVIEWER_PROJECT:-runline-reviewer}
 [[ $project =~ ^runline-reviewer(-[a-z0-9]+)*$ ]] || { echo "Use a runline-reviewer project name." >&2; exit 1; }
 private=.local/reviewer
 settings="$private/$project.env"
-password_file="$private/$project.password"
 env_file=$settings
 
 compose() {
@@ -17,26 +16,21 @@ compose() {
 }
 
 initialize() {
-  local host=$1 password hash
+  local host=$1
   [[ $host =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]] || { echo "Provide a hostname without a scheme or port." >&2; return 1; }
-  if [[ -e $settings || -e $password_file ]]; then
+  if [[ -e $settings ]]; then
     echo "Reviewer settings already exist for $project." >&2
     return 1
   fi
-  password=$(openssl rand -hex 16)
-  hash=$(printf '%s\n' "$password" | docker run --rm -i caddy:2.11.9-alpine caddy hash-password --bcrypt-cost 10)
-  [[ $hash == '$2'* ]] || { echo "Caddy did not produce a password hash." >&2; return 1; }
   {
     printf 'RUNLINE_REVIEWER_HOST=%s\n' "$host"
-    printf "RUNLINE_REVIEWER_HASH='%s'\n" "$hash"
     printf 'RUNLINE_DATASET_ID=%s\n' "$(openssl rand -hex 8)"
     for key in RUNLINE_SESSION_SECRET RUNLINE_DB_PASSWORD RUNLINE_APP_PASSWORD RUNLINE_DOCUMENTS_PASSWORD RUNLINE_S3_SECRET_KEY; do
       printf '%s=%s\n' "$key" "$(openssl rand -hex 32)"
     done
     printf 'RUNLINE_S3_ACCESS_KEY=%s\n' "$(openssl rand -hex 16)"
   } > "$settings"
-  printf '%s\n' "$password" > "$password_file"
-  echo "Reviewer settings are ready. The password for reviewer is in $password_file."
+  echo "Reviewer settings are ready."
 }
 
 archive_volume() {
@@ -104,7 +98,7 @@ trap 'exit 143' TERM
 if [[ $1 != init ]]; then
   [[ -f $settings ]] || { echo "Initialize $project first." >&2; exit 1; }
   # use the generated credentials and dataset even if the shell has old settings.
-  unset RUNLINE_DATASET_ID RUNLINE_SESSION_SECRET RUNLINE_REVIEWER_HOST RUNLINE_REVIEWER_HASH RUNLINE_DB_PASSWORD \
+  unset RUNLINE_DATASET_ID RUNLINE_SESSION_SECRET RUNLINE_REVIEWER_HOST RUNLINE_DB_PASSWORD \
     RUNLINE_APP_PASSWORD RUNLINE_DOCUMENTS_PASSWORD RUNLINE_S3_ACCESS_KEY RUNLINE_S3_SECRET_KEY
 fi
 

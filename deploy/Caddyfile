@@ -3,16 +3,10 @@
 }
 
 https://{$RUNLINE_REVIEWER_HOST} {
-	basic_auth {
-		reviewer {$RUNLINE_REVIEWER_HASH}
-	}
-
 	header {
 		X-Content-Type-Options nosniff
 		X-Robots-Tag "noindex, nofollow"
 	}
 
-	reverse_proxy web:3000 {
-		header_up -Authorization
-	}
+	reverse_proxy web:3000
 }

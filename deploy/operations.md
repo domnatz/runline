@@ -32,7 +32,7 @@ Allow inbound TCP ports 80 and 443 in the VPS firewall. Install Docker with Comp
 sudo ss -ltnp '( sport = :80 or sport = :443 )'
 ```
 
-The bundled Caddy service uses both ports. If the VPS already has a reverse proxy on them, configure the subdomain and reviewer authentication through that proxy before starting Runline on the shared host.
+The bundled Caddy service uses both ports. If the VPS already has a reverse proxy on them, configure the subdomain and HTTPS through that proxy before starting Runline on the shared host.
 
 For the bundled Caddy setup, clone the repository on the VPS, enter its directory, and replace the example hostname with your own:
 
@@ -41,16 +41,16 @@ bash deploy/reviewer.sh init runline.example.com
 bash deploy/reviewer.sh up
 ```
 
-Caddy provisions HTTPS and prompts for the username `reviewer`. The password is in `.local/reviewer/runline-reviewer.password`. Share it separately from the URL and keep the reviewer directory private. Use synthetic records for this instance.
+Caddy provisions HTTPS and opens Runline's sign-in page to visitors. Anyone can choose one of the sample roles and change the shared sample data. Use synthetic records and keep the reviewer environment file private. On an existing installation, keep that file and run `bash deploy/reviewer.sh up` after updating the checkout.
 
-From outside the VPS, confirm that HTTP redirects to HTTPS and that HTTPS asks for the reviewer password:
+From outside the VPS, check the HTTP redirect and HTTPS response.
 
 ```sh
 curl -I http://runline.example.com/login
 curl -I https://runline.example.com/login
 ```
 
-Expect an HTTP redirect and an HTTPS `401` with a `WWW-Authenticate` header. Then sign in through the browser and run the service-call walkthrough.
+Expect an HTTP redirect and an HTTPS `200` on the sign-in page. Then choose a sample role in the browser and run the service-call walkthrough.
 
 | Task | Command |
 | --- | --- |
